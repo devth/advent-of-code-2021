@@ -9,16 +9,19 @@
        string/split-lines
        (map read-string)))
 
-(count input)
+(defn count-increased [coll]
+  (:increased
+   (reduce
+    (fn [{:keys [increased prev-line] :as acc} line]
+      (assoc
+       acc
+       :increased (if (and prev-line (> line prev-line))
+                    (inc increased)
+                    increased)
+       :prev-line line))
+    {:increased 0 :prev-line nil}
+    coll)))
 
-(reduce
- (fn [{:keys [increased prev-line] :as acc} line]
-   (prn (assoc acc :line line
-               :increased (> line prev-line)
-               ))
-   (assoc
-    acc
-    :increased (if (and prev-line (> line prev-line)) (inc increased) increased)
-    :prev-line line))
- {:increased 0 :prev-line nil}
- input)
+(def part1 (count-increased input))
+
+(def part2 (count-increased (map (partial reduce +) (partition 3 1 input))))
